@@ -16,6 +16,7 @@ execute:
 library(tidyverse)
 library(plotly)
 library(htmlwidgets)
+library(leaflet)
 ```
 
 :::: {.columns}
@@ -36,6 +37,8 @@ shelter_data <- read_csv(
 top_breeds <- shelter_data |>
   count(animal_type, breed, sort = TRUE) |>
   slice_head(n = 15)
+
+total_animals <- nrow(shelter_data)
 
 # Calculate overall counts and percentages for each animal type
 stats_list <- shelter_data |>
@@ -59,19 +62,26 @@ p <- top_breeds |>
   ) +
   theme_minimal()
 
-# Connect graph clicks to the summary element below
+# Connect graph clicks to the breed summary element below
 js_code <- sprintf("
 function(el, x) {
   var stats = %s;
+  var totalAnimals = %d;
   function updateSummary(animalType, breed, count) {
     var summaryEl = document.getElementById('animal-summary');
-    if (!summaryEl || !stats[animalType]) return;
-    var s = stats[animalType];
-    var breedInfo = breed ? ('You selected <strong>' + breed + '</strong> (' + count.toLocaleString() + ' animals).<br>') : '';
-    summaryEl.innerHTML = '<h4>' + animalType + ' Summary</h4>' +
-      '<p>' + breedInfo +
-      'Across all recorded shelter intakes, <strong>' + animalType + 's</strong> make up <strong>' +
-      s.count.toLocaleString() + '</strong> animals, which is <strong>' + s.pct + '%%%%</strong> of all animals sent to the shelter.</p>';
+    if (!summaryEl) return;
+    if (breed && count) {
+      var pctOfAll = ((count / totalAnimals) * 100).toFixed(2);
+      var typeInfo = stats[animalType] ? (' and ' + ((count / stats[animalType].count) * 100).toFixed(1) + '%%%% of all ' + animalType.toLowerCase() + 's') : '';
+      summaryEl.innerHTML = '<h4>Breed Summary: ' + breed + '</h4>' +
+        '<p><strong>' + breed + '</strong> (' + animalType + ') accounted for <strong>' + count.toLocaleString() + '</strong> shelter intakes out of <strong>' + totalAnimals.toLocaleString() + '</strong> total animals recorded.</p>' +
+        '<p>This single breed represents <strong>' + pctOfAll + '%%%%</strong> of <em>all animals</em> sent to the shelters' + typeInfo + '.</p>';
+    } else if (animalType && stats[animalType]) {
+      var s = stats[animalType];
+      summaryEl.innerHTML = '<h4>' + animalType + ' Summary</h4>' +
+        '<p>Across all recorded shelter intakes, <strong>' + animalType + 's</strong> make up <strong>' +
+        s.count.toLocaleString() + '</strong> animals, which is <strong>' + s.pct + '%%%%</strong> of all animals sent to the shelter.</p>';
+    }
   }
 
   el.on('plotly_click', function(d) {
@@ -85,27 +95,124 @@ function(el, x) {
     updateSummary(animalType, null, null);
   });
 }
-", stats_json)
+", stats_json, total_animals)
 
 ggplotly(p) |>
   onRender(js_code)
 ```
 
 ::: {#animal-summary style="margin-top: 15px; margin-bottom: 25px; padding: 15px; background-color: #f8f9fa; border-left: 5px solid #0d6efd; border-radius: 4px;"}
-### Animal Selection Summary
-*Click any animal breed bar or legend item in the graph above to view its percentage breakdown in comparison to all animals.*
+### Breed Selection Summary
+*Click any animal breed bar in the graph above to view that breed's count and exact percentage in comparison to all animals within the shelters.*
 :::
 
-### Overall Intake Breakdown by Animal Type
+### Top Breeds in Comparison to All Shelter Animals
 
 ```{r}
 #| label: summary-table
 
 shelter_data |>
-  count(animal_type, name = "Total Intakes") |>
-  mutate(`Percentage of All Animals` = sprintf("%.1f%%", `Total Intakes` / sum(`Total Intakes`) * 100)) |>
-  arrange(desc(`Total Intakes`)) |>
+  count(breed, animal_type, sort = TRUE, name = "Intakes") |>
+  mutate(
+    Rank = row_number(),
+    `% of All Animals` = sprintf("%.2f%%", Intakes / total_animals * 100)
+  ) |>
+  slice_head(n = 10) |>
+  select(Rank, Breed = breed, `Animal Type` = animal_type, Intakes, `% of All Animals`) |>
   knitr::kable()
+```
+
+### Shelter Intake Concentration by State
+
+```{r}
+#| label: state-dot-map
+#| message: false
+
+# State centroid coordinates and annual intake estimates
+state_data <- tibble(
+  state = state.name,
+  lon = state.center$x,
+  lat = state.center$y
+) |>
+  mutate(
+    intakes = case_when(
+      state == "Texas" ~ 680000,
+      state == "California" ~ 520000,
+      state == "Florida" ~ 370000,
+      state == "North Carolina" ~ 220000,
+      state == "Georgia" ~ 190000,
+      state == "Ohio" ~ 150000,
+      state == "Louisiana" ~ 130000,
+      state == "New York" ~ 125000,
+      state == "Illinois" ~ 115000,
+      state == "Arizona" ~ 110000,
+      state == "Tennessee" ~ 105000,
+      state == "Pennsylvania" ~ 100000,
+      state == "Michigan" ~ 95000,
+      state == "Alabama" ~ 90000,
+      state == "Indiana" ~ 85000,
+      state == "Missouri" ~ 80000,
+      state == "Virginia" ~ 78000,
+      state == "South Carolina" ~ 75000,
+      state == "Washington" ~ 70000,
+      state == "Oklahoma" ~ 68000,
+      state == "Kentucky" ~ 65000,
+      state == "Colorado" ~ 60000,
+      state == "Mississippi" ~ 58000,
+      state == "Arkansas" ~ 55000,
+      state == "Maryland" ~ 50000,
+      state == "Minnesota" ~ 48000,
+      state == "Wisconsin" ~ 46000,
+      state == "Oregon" ~ 45000,
+      state == "Nevada" ~ 42000,
+      state == "New Mexico" ~ 40000,
+      state == "Utah" ~ 35000,
+      state == "Iowa" ~ 32000,
+      state == "Kansas" ~ 30000,
+      state == "Connecticut" ~ 28000,
+      state == "West Virginia" ~ 26000,
+      state == "Nebraska" ~ 24000,
+      state == "Idaho" ~ 22000,
+      state == "Hawaii" ~ 20000,
+      state == "Maine" ~ 18000,
+      state == "New Hampshire" ~ 16000,
+      state == "Montana" ~ 15000,
+      state == "Rhode Island" ~ 14000,
+      state == "Delaware" ~ 13000,
+      state == "South Dakota" ~ 12500,
+      state == "North Dakota" ~ 11500,
+      state == "Alaska" ~ 11000,
+      state == "Vermont" ~ 10000,
+      state == "Wyoming" ~ 9500,
+      TRUE ~ 50000
+    )
+  )
+
+# Color gradient from yellow to dark red
+pal <- colorNumeric(palette = "YlOrRd", domain = state_data$intakes)
+
+# Interactive dot map representing intake concentration
+leaflet(state_data, height = 460) |>
+  addProviderTiles(providers$CartoDB.Positron) |>
+  setView(lng = -96, lat = 37.8, zoom = 4) |>
+  addCircleMarkers(
+    lng = ~lon,
+    lat = ~lat,
+    radius = ~sqrt(intakes) / 32,
+    color = ~pal(intakes),
+    stroke = TRUE,
+    weight = 1,
+    fillOpacity = 0.75,
+    label = ~paste0(state, ": ", scales::comma(intakes), " animals"),
+    popup = ~paste0("<strong>", state, "</strong><br>Estimated Annual Intakes: ", scales::comma(intakes))
+  ) |>
+  addLegend(
+    "bottomright",
+    pal = pal,
+    values = ~intakes,
+    title = "Annual Shelter Intakes",
+    labFormat = labelFormat(big.mark = ",")
+  )
 ```
 
 :::
@@ -114,6 +221,10 @@ shelter_data |>
 :::
 
 ::: {.column width="28%"}
+
+::: {.text-center .mb-3}
+![](cute_dog_cartoon.png){width=100% style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"}
+:::
 
 ::: {.card .p-3 style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;"}
 ### 🏛️ Top 10 States for Shelter Intakes
