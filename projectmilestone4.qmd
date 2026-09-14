@@ -191,9 +191,9 @@ state_data <- tibble(
 # Color gradient from yellow to dark red
 pal <- colorNumeric(palette = "YlOrRd", domain = state_data$intakes)
 
-# Interactive dot map representing intake concentration
+# Interactive dot map representing intake concentration (no API key required)
 leaflet(state_data, height = 460) |>
-  addProviderTiles(providers$CartoDB.Positron) |>
+  addTiles() |>
   setView(lng = -96, lat = 37.8, zoom = 4) |>
   addCircleMarkers(
     lng = ~lon,
