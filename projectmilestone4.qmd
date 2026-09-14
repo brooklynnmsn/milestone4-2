@@ -1,6 +1,10 @@
 ---
 title: "Project Milestone 4"
-format: html
+format:
+  html:
+    theme: flatly
+    mainfont: "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    page-layout: full
 execute:
   echo: false
 ---
@@ -11,7 +15,12 @@ execute:
 
 library(tidyverse)
 library(plotly)
+library(htmlwidgets)
 ```
+
+:::: {.columns}
+
+::: {.column width="68%"}
 
 ```{r}
 #| label: animal-breeds-plot
@@ -28,6 +37,15 @@ top_breeds <- shelter_data |>
   count(animal_type, breed, sort = TRUE) |>
   slice_head(n = 15)
 
+# Calculate overall counts and percentages for each animal type
+stats_list <- shelter_data |>
+  count(animal_type) |>
+  mutate(pct = round(n / sum(n) * 100, 1)) |>
+  split(~animal_type) |>
+  lapply(\(df) list(count = df$n, pct = df$pct))
+
+stats_json <- jsonlite::toJSON(stats_list, auto_unbox = TRUE)
+
 # Create interactive bar plot showing breeds colored by animal type
 p <- top_breeds |>
   ggplot(aes(x = reorder(breed, n), y = n, fill = animal_type)) +
@@ -41,5 +59,83 @@ p <- top_breeds |>
   ) +
   theme_minimal()
 
-ggplotly(p)
+# Connect graph clicks to the summary element below
+js_code <- sprintf("
+function(el, x) {
+  var stats = %s;
+  function updateSummary(animalType, breed, count) {
+    var summaryEl = document.getElementById('animal-summary');
+    if (!summaryEl || !stats[animalType]) return;
+    var s = stats[animalType];
+    var breedInfo = breed ? ('You selected <strong>' + breed + '</strong> (' + count.toLocaleString() + ' animals).<br>') : '';
+    summaryEl.innerHTML = '<h4>' + animalType + ' Summary</h4>' +
+      '<p>' + breedInfo +
+      'Across all recorded shelter intakes, <strong>' + animalType + 's</strong> make up <strong>' +
+      s.count.toLocaleString() + '</strong> animals, which is <strong>' + s.pct + '%%%%</strong> of all animals sent to the shelter.</p>';
+  }
+
+  el.on('plotly_click', function(d) {
+    if (!d || !d.points || d.points.length === 0) return;
+    var pt = d.points[0];
+    updateSummary(pt.data.name, pt.y, pt.x);
+  });
+
+  el.on('plotly_legendclick', function(d) {
+    var animalType = d.data[d.curveNumber].name;
+    updateSummary(animalType, null, null);
+  });
+}
+", stats_json)
+
+ggplotly(p) |>
+  onRender(js_code)
 ```
+
+::: {#animal-summary style="margin-top: 15px; margin-bottom: 25px; padding: 15px; background-color: #f8f9fa; border-left: 5px solid #0d6efd; border-radius: 4px;"}
+### Animal Selection Summary
+*Click any animal breed bar or legend item in the graph above to view its percentage breakdown in comparison to all animals.*
+:::
+
+### Overall Intake Breakdown by Animal Type
+
+```{r}
+#| label: summary-table
+
+shelter_data |>
+  count(animal_type, name = "Total Intakes") |>
+  mutate(`Percentage of All Animals` = sprintf("%.1f%%", `Total Intakes` / sum(`Total Intakes`) * 100)) |>
+  arrange(desc(`Total Intakes`)) |>
+  knitr::kable()
+```
+
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="28%"}
+
+::: {.card .p-3 style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;"}
+### 🏛️ Top 10 States for Shelter Intakes
+
+Based on national reporting from Shelter Animals Count and Best Friends Animal Society:
+
+| Rank | State | Est. Intakes |
+|:----:|:------|-------------:|
+| 1 | Texas | ~680,000 |
+| 2 | California | ~520,000 |
+| 3 | Florida | ~370,000 |
+| 4 | North Carolina | ~220,000 |
+| 5 | Georgia | ~190,000 |
+| 6 | Ohio | ~150,000 |
+| 7 | Louisiana | ~130,000 |
+| 8 | New York | ~125,000 |
+| 9 | Illinois | ~115,000 |
+| 10 | Arizona | ~110,000 |
+
+*These 10 states account for more than 50% of all shelter intakes nationwide.*
+:::
+
+:::
+
+::::
