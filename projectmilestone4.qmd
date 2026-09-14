@@ -16,7 +16,6 @@ execute:
 library(tidyverse)
 library(plotly)
 library(htmlwidgets)
-library(leaflet)
 ```
 
 :::: {.columns}
@@ -127,6 +126,7 @@ shelter_data |>
 ```{r}
 #| label: state-dot-map
 #| message: false
+#| warning: false
 
 # State centroid coordinates and annual intake estimates
 state_data <- tibble(
@@ -186,33 +186,43 @@ state_data <- tibble(
       state == "Wyoming" ~ 9500,
       TRUE ~ 50000
     )
-  )
-
-# Color gradient from yellow to dark red
-pal <- colorNumeric(palette = "YlOrRd", domain = state_data$intakes)
-
-# Interactive dot map representing intake concentration (no API key required)
-leaflet(state_data, height = 460) |>
-  addTiles() |>
-  setView(lng = -96, lat = 37.8, zoom = 4) |>
-  addCircleMarkers(
-    lng = ~lon,
-    lat = ~lat,
-    radius = ~sqrt(intakes) / 32,
-    color = ~pal(intakes),
-    stroke = TRUE,
-    weight = 1,
-    fillOpacity = 0.75,
-    label = ~paste0(state, ": ", scales::comma(intakes), " animals"),
-    popup = ~paste0("<strong>", state, "</strong><br>Estimated Annual Intakes: ", scales::comma(intakes))
   ) |>
-  addLegend(
-    "bottomright",
-    pal = pal,
-    values = ~intakes,
-    title = "Annual Shelter Intakes",
-    labFormat = labelFormat(big.mark = ",")
+  filter(!state %in% c("Alaska", "Hawaii"))
+
+# Built-in US state boundaries (no external tile server needed)
+states_map <- map_data("state")
+
+# Build self-contained vector dot map
+p_map <- ggplot() +
+  geom_polygon(
+    data = states_map,
+    aes(x = long, y = lat, group = group),
+    fill = "#f8f9fa",
+    color = "#ced4da",
+    linewidth = 0.4
+  ) +
+  geom_point(
+    data = state_data,
+    aes(
+      x = lon,
+      y = lat,
+      size = intakes,
+      color = intakes,
+      text = paste0("<b>", state, "</b><br>Estimated Annual Intakes: ", scales::comma(intakes))
+    ),
+    alpha = 0.85
+  ) +
+  scale_size_continuous(range = c(3, 14), labels = scales::comma) +
+  scale_color_distiller(palette = "YlOrRd", direction = 1, labels = scales::comma) +
+  coord_fixed(1.3) +
+  theme_void() +
+  labs(
+    title = "Concentration of Animal Shelter Intakes by State",
+    size = "Intakes",
+    color = "Intakes"
   )
+
+ggplotly(p_map, tooltip = "text")
 ```
 
 :::
