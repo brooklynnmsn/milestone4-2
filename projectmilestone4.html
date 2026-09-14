@@ -26,41 +26,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -75,6 +40,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="projectmilestone4_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="projectmilestone4_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="projectmilestone4_files/libs/bootstrap/bootstrap-c19e201e7c4750a027ac7a2f6584b086.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="projectmilestone4_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="projectmilestone4_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="projectmilestone4_files/libs/plotly-binding-4.12.1/plotly.js"></script>
+<script src="projectmilestone4_files/libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="projectmilestone4_files/libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="projectmilestone4_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="projectmilestone4_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="projectmilestone4_files/libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="projectmilestone4_files/libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
 
 
 </head>
@@ -105,7 +79,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-ab532952f5ab4b679c7b" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-ab532952f5ab4b679c7b">{"x":{"data":[{"orientation":"h","width":[0.89999999999999858,0.89999999999999858,0.90000000000000036,0.90000000000000036],"base":[0,0,0,0],"x":[504,65,35,26],"y":[15,11,7,6],"text":["reorder(breed, n): Domestic Shorthair Mix<br />n: 504<br />animal_type: Cat","reorder(breed, n): Domestic Medium Hair Mix<br />n:  65<br />animal_type: Cat","reorder(breed, n): Domestic Longhair Mix<br />n:  35<br />animal_type: Cat","reorder(breed, n): Siamese Mix<br />n:  26<br />animal_type: Cat"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Cat","legendgroup":"Cat","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":[0.89999999999999858,0.89999999999999858,0.89999999999999858,0.89999999999999858,0.89999999999999858,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.89999999999999991],"base":[0,0,0,0,0,0,0,0,0],"x":[151,148,112,46,38,26,22,18,16],"y":[14,13,12,10,9,5,3,2,1],"text":["reorder(breed, n): Pit Bull Mix<br />n: 151<br />animal_type: Dog","reorder(breed, n): Chihuahua Shorthair Mix<br />n: 148<br />animal_type: Dog","reorder(breed, n): Labrador Retriever Mix<br />n: 112<br />animal_type: Dog","reorder(breed, n): Australian Cattle Dog Mix<br />n:  46<br />animal_type: Dog","reorder(breed, n): German Shepherd Mix<br />n:  38<br />animal_type: Dog","reorder(breed, n): Dachshund Mix<br />n:  26<br />animal_type: Dog","reorder(breed, n): Miniature Poodle Mix<br />n:  22<br />animal_type: Dog","reorder(breed, n): Australian Shepherd Mix<br />n:  18<br />animal_type: Dog","reorder(breed, n): Border Collie Mix<br />n:  16<br />animal_type: Dog"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Dog","legendgroup":"Dog","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"h","width":[0.89999999999999947,0.90000000000000036],"base":[0,0],"x":[38,23],"y":[8,4],"text":["reorder(breed, n): Bat Mix<br />n:  38<br />animal_type: Other","reorder(breed, n): Raccoon Mix<br />n:  23<br />animal_type: Other"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Other","legendgroup":"Other","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":40.840182648401829,"r":7.3059360730593621,"b":37.260273972602747,"l":171.689497716895},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Top Animal Breeds Sent to Shelters","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-25.200000000000003,529.20000000000005],"tickmode":"array","ticktext":["0","100","200","300","400","500"],"tickvals":[-3.5527136788005009e-15,100,200,300,400,500.00000000000006],"categoryorder":"array","categoryarray":["0","100","200","300","400","500"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,15.6],"tickmode":"array","ticktext":["Border Collie Mix","Australian Shepherd Mix","Miniature Poodle Mix","Raccoon Mix","Dachshund Mix","Siamese Mix","Domestic Longhair Mix","Bat Mix","German Shepherd Mix","Australian Cattle Dog Mix","Domestic Medium Hair Mix","Labrador Retriever Mix","Chihuahua Shorthair Mix","Pit Bull Mix","Domestic Shorthair Mix"],"tickvals":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"categoryorder":"array","categoryarray":["Border Collie Mix","Australian Shepherd Mix","Miniature Poodle Mix","Raccoon Mix","Dachshund Mix","Siamese Mix","Domestic Longhair Mix","Bat Mix","German Shepherd Mix","Australian Cattle Dog Mix","Domestic Medium Hair Mix","Labrador Retriever Mix","Chihuahua Shorthair Mix","Pit Bull Mix","Domestic Shorthair Mix"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Breed","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Animal Type","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"59804709f211":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"59804709f211","visdat":{"59804709f211":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 
 </main>

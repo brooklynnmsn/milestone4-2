@@ -1,6 +1,8 @@
 ---
 title: "Project Milestone 4"
 format: html
+execute:
+  echo: false
 ---
 
 ```{r}
@@ -8,4 +10,36 @@ format: html
 #| message: false
 
 library(tidyverse)
+library(plotly)
+```
+
+```{r}
+#| label: animal-breeds-plot
+#| message: false
+
+# Load sample open animal shelter data
+shelter_data <- read_csv(
+  "https://data.austintexas.gov/resource/wter-evkm.csv?$limit=2000",
+  show_col_types = FALSE
+)
+
+# Find top 15 most common breeds
+top_breeds <- shelter_data |>
+  count(animal_type, breed, sort = TRUE) |>
+  slice_head(n = 15)
+
+# Create interactive bar plot showing breeds colored by animal type
+p <- top_breeds |>
+  ggplot(aes(x = reorder(breed, n), y = n, fill = animal_type)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top Animal Breeds Sent to Shelters",
+    x = "Breed",
+    y = "Count",
+    fill = "Animal Type"
+  ) +
+  theme_minimal()
+
+ggplotly(p)
 ```
